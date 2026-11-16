@@ -18,21 +18,22 @@ def crear_libro(request):
 
 @api_view(['GET'])
 def listar_libros(request):
-    listado_libros = Libro.objects.all()
-    serializado = LibroSerializer(listado_libros, many=True)
-
-    return Response(serializado.data, status=status.HTTP_200_OK)
+    try:
+        listado_libros = Libro.objects.all()
+        serializado = LibroSerializer(listado_libros, many=True)
+        return Response(serializado.data, status=status.HTTP_202_ACCEPTED)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PATCH'])
 def modificar_libro(request, id):
     try:
-        libro_seleccioado = Libro.objects.get(id=id)
-        serializado = LibroSerializer(libro_seleccioado, data=request.data)
-
+        libro_seleccioado = Libro.objects.get(pk=id)
+        serializado = LibroSerializer(libro_seleccioado, data=request.data, partial=True)
         if serializado.is_valid():
             serializado.save()
-            return Response(serializado.data, status=status.HTTP_202_ACCEPTED)
+            return Response(serializado.data, status=status.HTTP_200_OK)
 
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
